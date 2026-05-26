@@ -1,6 +1,6 @@
 module.exports = {
   kafka: {
-    bootstrapServer: 'localhost:9092',
+    bootstrapServer: 'my-cluster-kafka-bootstrap.kafka.svc:9092',
     clientId: 'iot-sensor-producer'
   },
 
