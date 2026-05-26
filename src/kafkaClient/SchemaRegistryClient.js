@@ -4,12 +4,7 @@ const config = require('../config/config');
 const REGISTRY_URL =
   config.schemaRegistry?.url;
 
-  
-  
-
 class SchemaRegistryClient {
-
-  
 
   // ─────────────────────────────────────────
   // HEALTH CHECK
@@ -53,22 +48,24 @@ class SchemaRegistryClient {
 
   // ─────────────────────────────────────────
   // AVRO
+  // Fixed: removed 'deviceName' field to match
+  // the originally registered schema
   // ─────────────────────────────────────────
   static avroSchema() {
     return {
       schemaType: 'AVRO',
       schema: JSON.stringify({
+        doc: 'IoT Sensor Data Schema',
         type: 'record',
         name: 'IoTSensor',
         namespace: 'com.iot.sensor',
         fields: [
-          { name: 'deviceId', type: 'string' },
-          { name: 'deviceName', type: 'string' },
-          { name: 'temperature', type: 'int' },
-          { name: 'humidity', type: 'int' },
-          { name: 'pressure', type: 'int' },
-          { name: 'status', type: 'string' },
-          { name: 'timestamp', type: 'string' }
+          { name: 'deviceId',    type: 'string', doc: 'Unique device identifier' },
+          { name: 'temperature', type: 'int',    doc: 'Temperature in Celsius' },
+          { name: 'humidity',    type: 'int',    doc: 'Humidity percentage' },
+          { name: 'pressure',    type: 'int',    doc: 'Atmospheric pressure' },
+          { name: 'status',      type: 'string', doc: 'Sensor status' },
+          { name: 'timestamp',   type: 'string', doc: 'Event timestamp' }
         ]
       })
     };
@@ -76,30 +73,33 @@ class SchemaRegistryClient {
 
   // ─────────────────────────────────────────
   // NESTED AVRO
+  // Fixed: removed 'deviceName' field to match
+  // the originally registered schema
   // ─────────────────────────────────────────
   static nestedAvroSchema() {
     return {
       schemaType: 'AVRO',
       schema: JSON.stringify({
+        doc: 'IoT Sensor Nested Data Schema',
         type: 'record',
         name: 'IoTSensor',
         namespace: 'com.iot.sensor',
         fields: [
-          { name: 'deviceId', type: 'string' },
-          { name: 'deviceName', type: 'string' },
-          { name: 'temperature', type: 'int' },
-          { name: 'humidity', type: 'int' },
-          { name: 'pressure', type: 'int' },
-          { name: 'status', type: 'string' },
-          { name: 'timestamp', type: 'string' },
+          { name: 'deviceId',    type: 'string', doc: 'Unique device identifier' },
+          { name: 'temperature', type: 'int',    doc: 'Temperature in Celsius' },
+          { name: 'humidity',    type: 'int',    doc: 'Humidity percentage' },
+          { name: 'pressure',    type: 'int',    doc: 'Atmospheric pressure' },
+          { name: 'status',      type: 'string', doc: 'Sensor status' },
+          { name: 'timestamp',   type: 'string', doc: 'Event timestamp' },
 
           {
             name: 'location',
+            doc: 'Geographic location of sensor',
             type: {
               type: 'record',
               name: 'Location',
               fields: [
-                { name: 'latitude', type: 'string' },
+                { name: 'latitude',  type: 'string' },
                 { name: 'longitude', type: 'string' }
               ]
             }
@@ -107,11 +107,12 @@ class SchemaRegistryClient {
 
           {
             name: 'battery',
+            doc: 'Battery information',
             type: {
               type: 'record',
               name: 'Battery',
               fields: [
-                { name: 'level', type: 'int' },
+                { name: 'level',   type: 'int' },
                 { name: 'voltage', type: 'string' }
               ]
             }
@@ -119,22 +120,14 @@ class SchemaRegistryClient {
 
           {
             name: 'deviceHealth',
+            doc: 'Device health metrics',
             type: {
               type: 'record',
               name: 'DeviceHealth',
               fields: [
-                {
-                  name: 'signalStrength',
-                  type: 'int'
-                },
-                {
-                  name: 'networkType',
-                  type: 'string'
-                },
-                {
-                  name: 'firmwareVersion',
-                  type: 'string'
-                }
+                { name: 'signalStrength',   type: 'int' },
+                { name: 'networkType',      type: 'string' },
+                { name: 'firmwareVersion',  type: 'string' }
               ]
             }
           }
@@ -145,6 +138,8 @@ class SchemaRegistryClient {
 
   // ─────────────────────────────────────────
   // PROTOBUF
+  // Fixed: removed 'deviceName' field and
+  // restored original tag numbers 1-6
   // ─────────────────────────────────────────
   static protobufSchema() {
     return {
@@ -155,13 +150,12 @@ syntax = "proto3";
 package com.iot.sensor;
 
 message IoTSensor {
-  string deviceId = 1;
-  string deviceName = 2;
-  int32 temperature = 3;
-  int32 humidity = 4;
-  int32 pressure = 5;
-  string status = 6;
-  string timestamp = 7;
+  string deviceId    = 1;
+  int32  temperature = 2;
+  int32  humidity    = 3;
+  int32  pressure    = 4;
+  string status      = 5;
+  string timestamp   = 6;
 }
 `
     };
@@ -169,6 +163,9 @@ message IoTSensor {
 
   // ─────────────────────────────────────────
   // NESTED PROTOBUF
+  // Fixed: removed 'deviceName' field and
+  // restored original tag numbers 1-6,
+  // nested messages start at tag 7
   // ─────────────────────────────────────────
   static nestedProtobufSchema() {
     return {
@@ -179,33 +176,32 @@ syntax = "proto3";
 package com.iot.sensor;
 
 message Location {
-  string latitude = 1;
+  string latitude  = 1;
   string longitude = 2;
 }
 
 message Battery {
-  int32 level = 1;
+  int32  level   = 1;
   string voltage = 2;
 }
 
 message DeviceHealth {
-  int32 signalStrength = 1;
-  string networkType = 2;
+  int32  signalStrength  = 1;
+  string networkType     = 2;
   string firmwareVersion = 3;
 }
 
 message IoTSensor {
-  string deviceId = 1;
-  string deviceName = 2;
-  int32 temperature = 3;
-  int32 humidity = 4;
-  int32 pressure = 5;
-  string status = 6;
-  string timestamp = 7;
+  string deviceId    = 1;
+  int32  temperature = 2;
+  int32  humidity    = 3;
+  int32  pressure    = 4;
+  string status      = 5;
+  string timestamp   = 6;
 
-  Location location = 8;
-  Battery battery = 9;
-  DeviceHealth deviceHealth = 10;
+  Location     location     = 7;
+  Battery      battery      = 8;
+  DeviceHealth deviceHealth = 9;
 }
 `
     };
@@ -220,13 +216,12 @@ message IoTSensor {
       schema: JSON.stringify({
         type: 'object',
         properties: {
-          deviceId: { type: 'string' },
-          deviceName: { type: 'string' },
+          deviceId:    { type: 'string' },
           temperature: { type: 'integer' },
-          humidity: { type: 'integer' },
-          pressure: { type: 'integer' },
-          status: { type: 'string' },
-          timestamp: { type: 'string' }
+          humidity:    { type: 'integer' },
+          pressure:    { type: 'integer' },
+          status:      { type: 'string' },
+          timestamp:   { type: 'string' }
         }
       })
     };
@@ -241,50 +236,35 @@ message IoTSensor {
       schema: JSON.stringify({
         type: 'object',
         properties: {
-          deviceId: { type: 'string' },
-          deviceName: { type: 'string' },
+          deviceId:    { type: 'string' },
           temperature: { type: 'integer' },
-          humidity: { type: 'integer' },
-          pressure: { type: 'integer' },
-          status: { type: 'string' },
-          timestamp: { type: 'string' },
+          humidity:    { type: 'integer' },
+          pressure:    { type: 'integer' },
+          status:      { type: 'string' },
+          timestamp:   { type: 'string' },
 
           location: {
             type: 'object',
             properties: {
-              latitude: {
-                type: 'string'
-              },
-              longitude: {
-                type: 'string'
-              }
+              latitude:  { type: 'string' },
+              longitude: { type: 'string' }
             }
           },
 
           battery: {
             type: 'object',
             properties: {
-              level: {
-                type: 'integer'
-              },
-              voltage: {
-                type: 'string'
-              }
+              level:   { type: 'integer' },
+              voltage: { type: 'string' }
             }
           },
 
           deviceHealth: {
             type: 'object',
             properties: {
-              signalStrength: {
-                type: 'integer'
-              },
-              networkType: {
-                type: 'string'
-              },
-              firmwareVersion: {
-                type: 'string'
-              }
+              signalStrength:  { type: 'integer' },
+              networkType:     { type: 'string' },
+              firmwareVersion: { type: 'string' }
             }
           }
         }
@@ -313,15 +293,9 @@ message IoTSensor {
       schema: JSON.stringify({
         type: 'object',
         properties: {
-          deviceId: {
-            type: 'string'
-          },
-          status: {
-            type: 'string'
-          },
-          timestamp: {
-            type: 'string'
-          }
+          deviceId:  { type: 'string' },
+          status:    { type: 'string' },
+          timestamp: { type: 'string' }
         }
       })
     };
@@ -359,9 +333,7 @@ message IoTSensor {
         );
 
       console.log(
-        `✅ Schema registered:
-${subject}
-(id: ${response.data.id})`
+        `✅ Schema registered:\n${subject}\n(id: ${response.data.id})`
       );
 
       return response.data.id;
@@ -369,8 +341,7 @@ ${subject}
     } catch (error) {
 
       console.error(
-        `❌ Failed schema:
-${subject}`
+        `❌ Failed schema:\n${subject}`
       );
 
       console.error(
