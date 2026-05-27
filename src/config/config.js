@@ -17,7 +17,7 @@ module.exports = {
 },
 
   topics: {
-    jsonTopic: 'iot-json-topic'
+    jsonTopic: 'iot-sensor-avro'
   },
 
   producer: {
