@@ -1,26 +1,76 @@
+'use strict';
+
+require('dotenv').config();
+
 module.exports = {
+
   kafka: {
-    bootstrapServer: 'my-cluster-kafka-bootstrap.kafka.svc:9092',
-    clientId: 'iot-sensor-producer'
-  },
 
- schemaRegistry: {
-    url: 'http://karapace-schema-registry.schema-registry:8081',
-
+    bootstrapServer:
+      process.env.BOOTSTRAP_SERVERS,
 
     username:
-    '99x0xtckkeui7c0hieyaczouv',
+      process.env.SASL_USERNAME,
 
-  password:
-    'K0j3FtOrXIDW2YZ'
+    password:
+      process.env.SASL_PASSWORD,
 
-},
+    clientId:
+      'iot-sensor-producer',
+
+    retries: 0,
+
+    connectionTimeout: 3000
+  },
+
+  schemaRegistry: {
+
+    url:
+      process.env.SCHEMA_REGISTRY_URL,
+
+    username:
+      process.env.SCRE_USERNAME,
+
+    password:
+      process.env.SCRE_PASSWORD
+  },
 
   topics: {
-    jsonTopic: 'iot-sensor-avro'
+
+    stringTopic:
+      process.env.KAFKA_STRING_TOPIC,
+
+    jsonTopic:
+      process.env.KAFKA_JSON_TOPIC,
+
+    avroTopic:
+      process.env.KAFKA_AVRO_TOPIC,
+
+    protoTopic:
+      process.env.KAFKA_PROTO_TOPIC
   },
 
   producer: {
-    intervalMs: 5000
+
+    intervalMs:
+      parseInt(
+        process.env.INTERVAL_MS || '5000'
+      )
+  },
+
+  messageFormat:
+    process.env.MESSAGE_FORMAT || 'JSON',
+
+  keyRange: {
+
+    min:
+      parseInt(
+        process.env.MIN_KEY || '1'
+      ),
+
+    max:
+      parseInt(
+        process.env.MAX_KEY || '10'
+      )
   }
 };
